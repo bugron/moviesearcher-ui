@@ -45,7 +45,6 @@ function Search() {
   const updateQuery = (page = 1, newQuery = false) => {
     // A search query api call.
     if (searchTerm) {
-      console.log('API request triggered for ' + searchTerm);
       axios.get(`http://localhost:8970/api/search?t=${searchTerm}&y=${year}&type=${type}&page=${page}`, {
         auth: {
           username: localStorage.getItem('username'),
@@ -53,7 +52,6 @@ function Search() {
         }
       })
         .then(({ data }) => {
-          console.log('axios:get', data);
           if (data && data.Search) {
             setMovieData(oldData => {
               newMoviedata = {
@@ -75,7 +73,6 @@ function Search() {
   function handleScroll() {
     if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return;
     if (newMoviedata.nextPage) {
-      console.log('Fetch more list items!', newMoviedata);
       updateQuery(newMoviedata.nextPage, false);
     }
   }

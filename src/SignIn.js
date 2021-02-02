@@ -39,11 +39,8 @@ const useStyles = makeStyles((theme) => ({
 function SignIn({ username, password, setPassword, setUsername, setShowLogin }) {
   const classes = useStyles();
 
-  console.log(username);
-
   function handleSubmitClick(e) {
     e.preventDefault();
-    console.log(username, password);
 
     if (username && password) {
       localStorage.setItem('username', username);
