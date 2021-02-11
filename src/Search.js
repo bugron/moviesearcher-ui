@@ -16,6 +16,7 @@ import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
+    fontSize: '16px',
     marginTop: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
@@ -35,12 +36,19 @@ const useStyles = makeStyles((theme) => ({
     top: 0,
     left: 0,
     width: '100%'
+  },
+  error: {
+    textAlign: 'center',
+    color: 'red',
+    fontSize: '1.3em',
+    fontWeight: 'bold'
   }
 }));
 
 function Search() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [year, setYear] = useState('');
   const [type, setType] = useState('movie');
   const [movieData, setMovieData] = useState({ movies: [] });
@@ -61,6 +69,8 @@ function Search() {
         }
       })
         .then(({ data }) => {
+          // Reset error message
+          setError('');
           if (data && data.Search) {
             setMovieData(oldData => {
               newMoviedata = {
@@ -74,6 +84,9 @@ function Search() {
             setMovieData({ movies: [] });
           }
         })
+        .catch((error) => {
+          setError(error.message);
+        })
         .finally(() => setLoading(false));
     }
   };
@@ -81,7 +94,7 @@ function Search() {
   const delayedQuery = useCallback(debounce(() => updateQuery(1, true), 300), [searchTerm, year, type]);
 
   function handleScroll() {
-    if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return;
+    if (window.innerHeight + document.documentElement.scrollTop < 0.9 * document.documentElement.offsetHeight) return;
     if (newMoviedata.nextPage) {
       updateQuery(newMoviedata.nextPage, false);
     }
@@ -162,11 +175,12 @@ function Search() {
         </div>
 
         <Container maxWidth="sm">
+          {error && <p className={classes.error}>{error}</p>}
           {
             movieData.movies && movieData.movies.length
               ? movieData.movies.map((movie, i) => 
                 <RenderMovie key={`${movie.imdbID}_${i}`} movie={movie} />)
-              : <p style={{ textAlign: 'center' }}><i>Nothing found</i></p>
+              : !error && <p style={{ textAlign: 'center' }}><i>Nothing found</i></p>
           }
           {loading && <LinearProgress className={classes.progress} color="secondary" />}
         </Container>
