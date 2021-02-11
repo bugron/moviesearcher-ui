@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -15,7 +16,7 @@ import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -28,11 +29,18 @@ const useStyles = makeStyles((theme) => ({
   },
   poster: {
     height: 100
+  },
+  progress: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%'
   }
 }));
 
 function Search() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
   const [year, setYear] = useState('');
   const [type, setType] = useState('movie');
   const [movieData, setMovieData] = useState({ movies: [] });
@@ -45,6 +53,7 @@ function Search() {
   const updateQuery = (page = 1, newQuery = false) => {
     // A search query api call.
     if (searchTerm) {
+      setLoading(true);
       axios.get(`http://localhost:8970/api/search?t=${searchTerm}&y=${year}&type=${type}&page=${page}`, {
         auth: {
           username: localStorage.getItem('username'),
@@ -64,7 +73,8 @@ function Search() {
           } else {
             setMovieData({ movies: [] });
           }
-        });
+        })
+        .finally(() => setLoading(false));
     }
   };
 
@@ -158,6 +168,7 @@ function Search() {
                 <RenderMovie key={`${movie.imdbID}_${i}`} movie={movie} />)
               : <p style={{ textAlign: 'center' }}><i>Nothing found</i></p>
           }
+          {loading && <LinearProgress className={classes.progress} color="secondary" />}
         </Container>
       </div>
     </Container>

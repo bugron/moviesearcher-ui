@@ -17,10 +17,10 @@ function App() {
   return showLogin
     ? <SignIn
       username={u}
+      password={p}
       setShowLogin={setShowLogin}
       setUsername={setUsername}
       setPassword={setPassword}
-      password={p}
     />
     : <Search />;
 }
